@@ -120,7 +120,7 @@
       margin-bottom: 1rem;
       word-break: break-word;
       position: relative;
-      padding-left: 2rem !important;
+      padding-left: 3.5rem !important;
     }
 
     .card-user {
@@ -263,9 +263,10 @@
       width: 100vw;
       height: 100vh;
       z-index: -1;
-      opacity: 0.10;
+      opacity: 0.18;
       pointer-events: none;
-      background: repeating-linear-gradient(120deg, transparent, transparent 70px, rgba(240,165,0,0.05) 71px, transparent 72px), repeating-linear-gradient(60deg, transparent, transparent 70px, rgba(240,165,0,0.05) 71px, transparent 72px);
+      background: repeating-linear-gradient(120deg, transparent, transparent 70px, rgba(240,165,0,0.13) 71px, transparent 72px), repeating-linear-gradient(60deg, transparent, transparent 70px, rgba(240,165,0,0.13) 71px, transparent 72px);
+      filter: drop-shadow(0 0 8px #f0a50055);
     }
 
     footer.corporate-footer {
@@ -290,6 +291,87 @@
     footer.corporate-footer a:hover {
       color: var(--hive-amber);
     }
+
+    .bot-avatar {
+      position: absolute;
+      left: -3.2rem;
+      top: 0.3rem;
+      width: 3.2rem;
+      height: 3.2rem;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--hive-amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 2px 12px 2px rgba(240, 165, 0, 0.18), 0 0 0 4px rgba(240, 165, 0, 0.08);
+    }
+    .bot-name {
+      font-size: 0.95rem;
+      color: var(--hive-gold);
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      margin-left: 0.2rem;
+      letter-spacing: 0.2px;
+    }
+    .reactions {
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .reaction-btn {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+      opacity: 0.7;
+    }
+    .reaction-btn:hover {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+
+    .quick-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0.7rem 0 0.7rem 0;
+      flex-wrap: wrap;
+    }
+    .quick-btn {
+      background: var(--hive-amber);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 2px 8px rgba(240, 165, 0, 0.08);
+    }
+    .quick-btn.selected, .quick-btn:active {
+      background: var(--hive-gold);
+      color: #1a1a1a;
+      transform: scale(1.05);
+    }
+    .quick-btn:hover {
+      background: var(--hive-honey);
+      color: #1a1a1a;
+    }
+    .security-tip {
+      background: #2b2b2b;
+      color: #f0a500;
+      border-left: 4px solid var(--hive-amber);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.98rem;
+      margin: 1rem 0 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
   </style>
 </head>
 <body>
@@ -300,26 +382,26 @@
       <div class="logo">
         <i class="bi bi-hexagon-fill logo-icon"></i>
         <span>HIVEPlace Enterprise</span>
-        <div class="ms-2"><span class="status-indicator"></span><small>Online</small></div>
+        <div class="ms-2"><span class="status-indicator"></span><small>🟢 Online</small></div>
       </div>
       <div class="d-none d-md-flex align-items-center">
-        <span class="badge bg-success me-2"><i class="bi bi-shield-check me-1"></i>Segurança Verificada</span>
-        <span class="badge bg-primary"><i class="bi bi-clock-history me-1"></i>Suporte 24/7</span>
+        <span class="badge bg-success me-2"><i class="bi bi-shield-check me-1"></i>🔒 Segurança Verificada</span>
+        <span class="badge bg-primary"><i class="bi bi-clock-history me-1"></i>⏰ Suporte 24/7</span>
       </div>
     </div>
 
-    <h2 class="mb-4"><i class="bi bi-headset me-2"></i>Atendimento Corporativo</h2>
+    <h2 class="mb-4"><i class="bi bi-headset me-2"></i>🤖 Atendimento Corporativo Premium</h2>
 
     <div id="chatBox" class="d-flex flex-column"></div>
 
     <div class="input-container">
       <div class="input-group">
-        <input type="text" id="userInput" class="form-control" placeholder="Digite sua solicitação ou dúvida corporativa..." autocomplete="off">
+        <input type="text" id="userInput" class="form-control" placeholder="💬 Digite sua solicitação ou dúvida corporativa..." autocomplete="off">
         <button id="sendBtn" class="btn btn-send">
-          <i class="bi bi-send-fill me-1"></i> Enviar
+          <i class="bi bi-send-fill me-1"></i> ✉️ Enviar
         </button>
         <button id="resetBtn" class="btn btn-reset" title="Resetar memória">
-          <i class="bi bi-arrow-counterclockwise"></i><span>Nova Sessão</span>
+          <i class="bi bi-arrow-counterclockwise"></i><span>🔄 Nova Sessão</span>
         </button>
       </div>
     </div>
@@ -340,7 +422,7 @@
     `;
     hexagonBg.innerHTML = hexSvg.repeat(100);
 
-    function appendMessage(text, sender, id = null) {
+    function appendMessage(text, sender, id = null, showReactions = false) {
       const msgDiv = document.createElement('div');
       msgDiv.className = 'msg-container';
       if (id) msgDiv.id = id;
@@ -348,10 +430,21 @@
       const card = document.createElement('div');
       card.className = `card p-3 ${sender === 'user' ? 'card-user ms-auto' : 'card-bot me-auto'}`;
       
+      // Adicionar avatar e nome do atendente virtual
+      if (sender === 'bot') {
+        const avatar = document.createElement('div');
+        avatar.className = 'bot-avatar';
+        avatar.innerHTML = `<svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="19" cy="19" r="19" fill="#fff"/><ellipse cx="19" cy="23" rx="10" ry="7" fill="#f0a500"/><ellipse cx="19" cy="17" rx="7" ry="6" fill="#cf7500"/><ellipse cx="15.5" cy="15.5" rx="1.5" ry="2" fill="#fff"/><ellipse cx="22.5" cy="15.5" rx="1.5" ry="2" fill="#fff"/><ellipse cx="19" cy="25" rx="2.5" ry="1.5" fill="#fff"/><rect x="17" y="10" width="4" height="6" rx="2" fill="#f0a500"/><ellipse cx="13" cy="11" rx="2" ry="1" fill="#cf7500"/><ellipse cx="25" cy="11" rx="2" ry="1" fill="#cf7500"/></svg>`;
+        avatar.title = 'Bee | Suporte Técnico HIVEPlace';
+        card.appendChild(avatar);
+        const name = document.createElement('div');
+        name.className = 'bot-name';
+        name.textContent = 'Bee | Suporte Técnico HIVEPlace';
+        card.appendChild(name);
+      }
       // Adicionar ícone apropriado
       const icon = document.createElement('span');
       icon.className = 'msg-icon';
-      
       if (sender === 'user') {
         icon.innerHTML = '<i class="bi bi-person-badge"></i>';
       } else if (id === 'digitando') {
@@ -359,32 +452,155 @@
       } else {
         icon.innerHTML = '<i class="bi bi-briefcase-fill"></i>';
       }
-      
       // Criar elemento para o texto
       const textEl = document.createElement('div');
-      textEl.innerHTML = text; // Usar innerHTML para permitir formatação e emojis
-      
+      textEl.innerHTML = text;
       // Adicionar timestamp
       const timeEl = document.createElement('div');
       timeEl.className = 'msg-time';
       const now = new Date();
       timeEl.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} • HIVEPlace Enterprise`;
-      
       card.appendChild(icon);
       card.appendChild(textEl);
       card.appendChild(timeEl);
-
+      // Reações rápidas
+      if (sender === 'bot' && showReactions) {
+        const reactions = document.createElement('div');
+        reactions.className = 'reactions';
+        ['👍', '😊', '👀'].forEach(emoji => {
+          const btn = document.createElement('button');
+          btn.className = 'reaction-btn';
+          btn.innerText = emoji;
+          btn.title = 'Enviar reação';
+          btn.onclick = () => {
+            btn.style.transform = 'scale(1.4)';
+            setTimeout(() => btn.style.transform = '', 200);
+          };
+          reactions.appendChild(btn);
+        });
+        card.appendChild(reactions);
+      }
       msgDiv.appendChild(card);
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
+    // Fluxo guiado inicial
+    let userProfile = null;
+    let userService = null;
+
+    function showProfileSelection() {
+      const container = document.createElement('div');
+      container.className = 'quick-buttons';
+      ['Fornecedor', 'Consumidor'].forEach(profile => {
+        const btn = document.createElement('button');
+        btn.className = 'quick-btn';
+        btn.innerText = profile;
+        btn.onclick = () => {
+          userProfile = profile;
+          Array.from(container.children).forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          setTimeout(() => {
+            appendMessage(`<b>Ótimo! Agora, qual serviço HivePlace você deseja integrar?</b>`, 'bot');
+            showServiceSelection();
+          }, 400);
+        };
+        container.appendChild(btn);
+      });
+      chatBox.appendChild(container);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showServiceSelection() {
+      const container = document.createElement('div');
+      container.className = 'quick-buttons';
+      const services = [
+        'Débitos Veiculares',
+        'Antifraude',
+        'Consentimento',
+        'Outro'
+      ];
+      services.forEach(service => {
+        const btn = document.createElement('button');
+        btn.className = 'quick-btn';
+        btn.innerText = service;
+        btn.onclick = () => {
+          userService = service;
+          Array.from(container.children).forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          setTimeout(() => {
+            showServiceInstructions(service);
+          }, 400);
+        };
+        container.appendChild(btn);
+      });
+      chatBox.appendChild(container);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showServiceInstructions(service) {
+      let docLink = 'https://portal.hiveplace.com.br/';
+      let exampleLink = 'https://portal.hiveplace.com.br/';
+      appendMessage(
+        `<b>Perfeito!</b> Para integrar o serviço <b>${service}</b> como <b>${userProfile}</b>, siga as instruções abaixo:<br><ul><li>Acesse a <a href="${docLink}" target="_blank">documentação técnica oficial</a>.</li><li>Veja <a href="${exampleLink}" target="_blank">exemplos de código</a> para integração.</li><li>Em caso de dúvidas, utilize o comando <span style="background:#cf7500;color:#fff;padding:2px 8px;border-radius:8px;font-size:0.95em;">/faq</span> ou <span style="background:#cf7500;color:#fff;padding:2px 8px;border-radius:8px;font-size:0.95em;">/suporte</span>.</li></ul>`,
+        'bot', null, true
+      );
+      appendMessage('<div class="security-tip"><i class="bi bi-shield-lock"></i> Nunca compartilhe credenciais, tokens ou dados sensíveis no chat. Siga sempre as boas práticas de segurança e LGPD.</div>', 'bot');
+    }
+
+    // Sugestões de perguntas como botões rápidos
+    function showQuestionSuggestions() {
+      const container = document.createElement('div');
+      container.className = 'quick-buttons';
+      const questions = [
+        'Como integro a API de antifraude?',
+        'Quais APIs estão disponíveis?',
+        'Como funciona a autenticação?',
+        'A HivePlace oferece exemplos de código?',
+        'Como tratar erros de integração?'
+      ];
+      questions.forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'quick-btn';
+        btn.innerText = q;
+        btn.onclick = () => {
+          enviarMensagem(q);
+        };
+        container.appendChild(btn);
+      });
+      chatBox.appendChild(container);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Comando para FAQ
+    function showFAQ() {
+      appendMessage('<b>Perguntas Frequentes:</b><ul><li><b>Quais APIs estão disponíveis?</b> Acesse <a href="https://portal.hiveplace.com.br/" target="_blank">nossa documentação</a>.</li><li><b>Como faço autenticação?</b> Veja detalhes em <a href="https://portal.hiveplace.com.br/" target="_blank">autenticação</a>.</li><li><b>Há exemplos de código?</b> Sim, acesse <a href="https://portal.hiveplace.com.br/" target="_blank">exemplos práticos</a>.</li><li><b>As APIs seguem LGPD?</b> Sim, todas as integrações respeitam LGPD e segurança.</li><li><b>O que fazer em caso de erro?</b> Consulte fallback na documentação ou acione <a href="mailto:contato@hiveplace.com">suporte técnico</a>.</li></ul>', 'bot', null, true);
+    }
+
+    // Comando para suporte humano
+    function showSupport() {
+      appendMessage('Se precisar de atendimento humano ou suporte avançado, envie um e-mail para <a href="mailto:contato@hiveplace.com">contato@hiveplace.com</a> ou acione nosso plantão 24x7.', 'bot', null, true);
+    }
+
+    // Interceptar comandos rápidos
+    function interceptQuickCommands(msg) {
+      if (msg.trim().toLowerCase() === '/faq') {
+        showFAQ();
+        return true;
+      }
+      if (msg.trim().toLowerCase() === '/suporte') {
+        showSupport();
+        return true;
+      }
+      return false;
+    }
+
+    // Ajustar função enviarMensagem para comandos rápidos
     function enviarMensagem(msg) {
+      if (interceptQuickCommands(msg)) return;
       appendMessage(msg, 'user');
-
       const typingId = 'digitando';
-      appendMessage('<div class="typing-indicator"><span></span><span></span><span></span></div> Processando sua solicitação...', 'bot', typingId);
-
+      appendMessage('<div class="typing-indicator"><span></span><span></span><span></span></div> <span style="font-size:1.1em;">🤔</span> Bee está digitando...', 'bot', typingId);
       fetch('https://n8n.yukz.com.br/webhook/text-hive-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -395,16 +611,25 @@
         setTimeout(() => {
           const typingMsg = document.getElementById(typingId);
           if (typingMsg) typingMsg.remove();
-          appendMessage(data.resposta || '⚠️ <b>Solicitação não processada</b><br><br>Não foi possível processar sua solicitação no momento. Por favor, reformule ou entre em contato com nosso suporte corporativo.', 'bot');
+          appendMessage(data.resposta || '⚠️ <b>Solicitação não processada</b><br><br>Não foi possível processar sua solicitação no momento. Por favor, reformule ou entre em contato com nosso suporte técnico.', 'bot', null, true);
         }, 1500);
       })
       .catch(err => {
         console.error(err);
         const typingMsg = document.getElementById(typingId);
         if (typingMsg) typingMsg.remove();
-        appendMessage('⚠️ <b>Erro de Comunicação</b><br><br>Detectamos um problema na conexão com nossos servidores. Nossa equipe de TI foi automaticamente notificada.<br><br>🔄 Por favor, tente novamente em alguns instantes ou contate nosso suporte pelo e-mail <b>suporte@hiveplace.com</b>', 'bot');
+        appendMessage('⚠️ <b>Erro de Comunicação</b><br><br>Detectamos um problema na conexão com nossos servidores. Nossa equipe de TI foi automaticamente notificada.<br><br>🔄 Por favor, tente novamente em alguns instantes ou contate nosso suporte pelo e-mail <b>contato@hiveplace.com</b>', 'bot', null, true);
       });
     }
+
+    // Mensagem de boas-vindas e início do fluxo guiado
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        appendMessage('👋 <b>Olá! Eu sou Bee, Assistente HivePlace, especializada em integração via API.</b><br><br>Para começarmos, você é <b>fornecedor</b> ou <b>consumidor</b>?<br><br><span style="color:#f0a500">Selecione abaixo e depois escolha o serviço HivePlace que deseja integrar:</span>', 'bot', null, true);
+        showProfileSelection();
+        showQuestionSuggestions();
+      }, 500);
+    });
 
     sendBtn.addEventListener('click', () => {
       const message = userInput.value.trim();
@@ -474,19 +699,12 @@
       }
     `;
     document.head.appendChild(style);
-    
-    // Mensagem de boas-vindas
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        appendMessage('👋 <b>Bem-vindo ao Atendimento Corporativo HIVEPlace</b><br><br>Sou seu assistente virtual especializado em soluções empresariais. Como posso auxiliá-lo hoje?<br><br>📊 <b>Relatórios e Analytics</b><br>📈 <b>Análises de Desempenho</b><br>🔧 <b>Suporte Técnico Avançado</b><br>📝 <b>Documentação Empresarial</b><br>💼 <b>Gestão de Projetos</b>', 'bot');
-      }, 500);
-    });
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <footer class="corporate-footer">
-    &copy; 2024 HIVEPlace Enterprise. Todos os direitos reservados.
-    <span class="d-none d-md-inline">| <a href="https://hiveplace.com" target="_blank">Site Institucional</a> | <a href="mailto:contato@hiveplace.com">Contato</a></span>
+    &copy; 2024 HIVEPlace. Todos os direitos reservados.
+    <span class="d-none d-md-inline">| <a href="https://hiveplace.com" target="_blank">🌐 Site HIVEPlace</a> | <a href="mailto:contato@hiveplace.com">✉️ Suporte Técnico</a></span>
   </footer>
 </body>
 </html>
