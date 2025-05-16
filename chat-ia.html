@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat IA - HIVEPlace</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --hive-dark: #1a1a1a;
+      --hive-dark-secondary: #2b2b2b;
+      --hive-gold: #f0a500;
+      --hive-amber: #cf7500;
+      --hive-honey: #ffbf00;
+      --hive-text: #e0e0e0;
+      --hive-border-radius: 12px;
+    }
+
+    body {
+      background-color: var(--hive-dark);
+      color: var(--hive-text);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="none" stroke="%23cf7500" stroke-width="1" d="M50 0 L75 25 L75 75 L50 100 L25 75 L25 25 Z"></path></svg>');
+      background-size: 80px 80px;
+      background-repeat: repeat;
+      opacity: 0.05;
+      z-index: -1;
+    }
+
+    .header {
+      padding: 1rem 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(207, 117, 0, 0.2);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--hive-gold);
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    .logo-icon {
+      color: var(--hive-amber);
+    }
+
+    h2 {
+      color: var(--hive-gold);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background-color: var(--hive-amber);
+      border-radius: 3px;
+    }
+
+    #chatBox {
+      height: calc(100vh - 220px);
+      min-height: 350px;
+      overflow-y: auto;
+      background: var(--hive-dark-secondary);
+      padding: 1rem;
+      border-radius: var(--hive-border-radius);
+      margin-bottom: 1rem;
+      border: 1px solid rgba(207, 117, 0, 0.1);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      scrollbar-width: thin;
+      scrollbar-color: var(--hive-amber) var(--hive-dark-secondary);
+    }
+
+    #chatBox::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chatBox::-webkit-scrollbar-track {
+      background: var(--hive-dark-secondary);
+    }
+
+    #chatBox::-webkit-scrollbar-thumb {
+      background-color: var(--hive-amber);
+      border-radius: 20px;
+    }
+
+    .msg-container {
+      display: flex;
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+
+    .card-user, .card-bot {
+      max-width: 75%;
+      border-radius: var(--hive-border-radius);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      margin-bottom: 1rem;
+      word-break: break-word;
+      position: relative;
+      padding-left: 2rem !important;
+    }
+
+    .card-user {
+      background-color: var(--hive-amber);
+      color: #fff;
+    }
+
+    .card-bot {
+      background-color: var(--hive-dark-secondary);
+      border: 1px solid rgba(240, 165, 0, 0.2);
+      color: #fff;
+    }
+    
+    .msg-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      opacity: 0.9;
+      color: var(--hive-gold);
+    }
+    
+    .msg-time {
+      font-size: 0.7rem;
+      opacity: 0.7;
+      text-align: right;
+      margin-top: 5px;
+      font-style: italic;
+      color: #fff;
+    }
+
+    .input-container {
+      background-color: var(--hive-dark-secondary);
+      border-radius: var(--hive-border-radius);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(207, 117, 0, 0.1);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .input-group input {
+      background-color: rgba(26, 26, 26, 0.7);
+      color: #fff;
+      border: 1px solid rgba(207, 117, 0, 0.2);
+      border-radius: var(--hive-border-radius);
+      padding: 0.75rem 1rem;
+      transition: all 0.3s ease;
+      flex-grow: 1;
+    }
+    .input-group input::placeholder {
+      color: #fff;
+      opacity: 0.7;
+    }
+
+    .btn {
+      border-radius: var(--hive-border-radius);
+      padding: 0.75rem 1.25rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(240, 165, 0, 0.10);
+      outline: none;
+    }
+    .btn:focus {
+      box-shadow: 0 0 0 3px rgba(240, 165, 0, 0.3);
+      border-color: var(--hive-gold);
+    }
+    .btn-send {
+      background: linear-gradient(90deg, var(--hive-gold) 60%, var(--hive-amber) 100%);
+      color: #1a1a1a;
+      border: none;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .btn-send:hover, .btn-send:focus {
+      background: linear-gradient(90deg, var(--hive-amber) 60%, var(--hive-gold) 100%);
+      color: #fff;
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 4px 16px rgba(240, 165, 0, 0.15);
+    }
+    .btn-reset {
+      background-color: transparent;
+      color: var(--hive-gold);
+      border: 1.5px solid var(--hive-gold);
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    .btn-reset:hover, .btn-reset:focus {
+      background-color: rgba(240, 165, 0, 0.15);
+      color: #fff;
+      border-color: var(--hive-amber);
+      box-shadow: 0 2px 8px rgba(240, 165, 0, 0.10);
+    }
+
+    @media (max-width: 768px) {
+      .card-user, .card-bot {
+        max-width: 90%;
+      }
+
+      #chatBox {
+        height: calc(100vh - 250px);
+      }
+
+      .btn {
+        padding: 0.6rem 1rem;
+      }
+
+      .input-group {
+        flex-wrap: nowrap;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .header {
+        padding: 0.75rem 0;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .btn-reset {
+        padding: 0.6rem;
+      }
+
+      .btn-reset span {
+        display: none;
+      }
+    }
+
+    /* Hexagon pattern for background - mais visível */
+    .hexagon-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      opacity: 0.10;
+      pointer-events: none;
+      background: repeating-linear-gradient(120deg, transparent, transparent 70px, rgba(240,165,0,0.05) 71px, transparent 72px), repeating-linear-gradient(60deg, transparent, transparent 70px, rgba(240,165,0,0.05) 71px, transparent 72px);
+    }
+
+    footer.corporate-footer {
+      width: 100%;
+      background: #181818;
+      color: #fff;
+      border-top: 1.5px solid var(--hive-amber);
+      text-align: center;
+      padding: 1.2rem 0 0.7rem 0;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      margin-top: 2rem;
+      box-shadow: 0 -2px 8px rgba(240, 165, 0, 0.05);
+    }
+    footer.corporate-footer a {
+      color: var(--hive-gold);
+      text-decoration: underline;
+      margin: 0 0.5rem;
+      font-weight: 500;
+    }
+    footer.corporate-footer a:hover {
+      color: var(--hive-amber);
+    }
+  </style>
+</head>
+<body>
+  <div class="hexagon-bg"></div>
+
+  <div class="container py-4">
+    <div class="header">
+      <div class="logo">
+        <i class="bi bi-hexagon-fill logo-icon"></i>
+        <span>HIVEPlace Enterprise</span>
+        <div class="ms-2"><span class="status-indicator"></span><small>Online</small></div>
+      </div>
+      <div class="d-none d-md-flex align-items-center">
+        <span class="badge bg-success me-2"><i class="bi bi-shield-check me-1"></i>Segurança Verificada</span>
+        <span class="badge bg-primary"><i class="bi bi-clock-history me-1"></i>Suporte 24/7</span>
+      </div>
+    </div>
+
+    <h2 class="mb-4"><i class="bi bi-headset me-2"></i>Atendimento Corporativo</h2>
+
+    <div id="chatBox" class="d-flex flex-column"></div>
+
+    <div class="input-container">
+      <div class="input-group">
+        <input type="text" id="userInput" class="form-control" placeholder="Digite sua solicitação ou dúvida corporativa..." autocomplete="off">
+        <button id="sendBtn" class="btn btn-send">
+          <i class="bi bi-send-fill me-1"></i> Enviar
+        </button>
+        <button id="resetBtn" class="btn btn-reset" title="Resetar memória">
+          <i class="bi bi-arrow-counterclockwise"></i><span>Nova Sessão</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Criar padrão de hexágonos para o fundo
+    const hexagonBg = document.querySelector('.hexagon-bg');
+    const hexSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+        <path fill="none" stroke="#cf7500" stroke-width="1" d="M50 0 L75 25 L75 75 L50 100 L25 75 L25 25 Z"></path>
+      </svg>
+    `;
+    hexagonBg.innerHTML = hexSvg.repeat(100);
+
+    function appendMessage(text, sender, id = null) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'msg-container';
+      if (id) msgDiv.id = id;
+
+      const card = document.createElement('div');
+      card.className = `card p-3 ${sender === 'user' ? 'card-user ms-auto' : 'card-bot me-auto'}`;
+      
+      // Adicionar ícone apropriado
+      const icon = document.createElement('span');
+      icon.className = 'msg-icon';
+      
+      if (sender === 'user') {
+        icon.innerHTML = '<i class="bi bi-person-badge"></i>';
+      } else if (id === 'digitando') {
+        icon.innerHTML = '<i class="bi bi-three-dots"></i>';
+      } else {
+        icon.innerHTML = '<i class="bi bi-briefcase-fill"></i>';
+      }
+      
+      // Criar elemento para o texto
+      const textEl = document.createElement('div');
+      textEl.innerHTML = text; // Usar innerHTML para permitir formatação e emojis
+      
+      // Adicionar timestamp
+      const timeEl = document.createElement('div');
+      timeEl.className = 'msg-time';
+      const now = new Date();
+      timeEl.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')} • HIVEPlace Enterprise`;
+      
+      card.appendChild(icon);
+      card.appendChild(textEl);
+      card.appendChild(timeEl);
+
+      msgDiv.appendChild(card);
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function enviarMensagem(msg) {
+      appendMessage(msg, 'user');
+
+      const typingId = 'digitando';
+      appendMessage('<div class="typing-indicator"><span></span><span></span><span></span></div> Processando sua solicitação...', 'bot', typingId);
+
+      fetch('https://n8n.yukz.com.br/webhook/text-hive-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mensagem: msg })
+      })
+      .then(res => res.json())
+      .then(data => {
+        setTimeout(() => {
+          const typingMsg = document.getElementById(typingId);
+          if (typingMsg) typingMsg.remove();
+          appendMessage(data.resposta || '⚠️ <b>Solicitação não processada</b><br><br>Não foi possível processar sua solicitação no momento. Por favor, reformule ou entre em contato com nosso suporte corporativo.', 'bot');
+        }, 1500);
+      })
+      .catch(err => {
+        console.error(err);
+        const typingMsg = document.getElementById(typingId);
+        if (typingMsg) typingMsg.remove();
+        appendMessage('⚠️ <b>Erro de Comunicação</b><br><br>Detectamos um problema na conexão com nossos servidores. Nossa equipe de TI foi automaticamente notificada.<br><br>🔄 Por favor, tente novamente em alguns instantes ou contate nosso suporte pelo e-mail <b>suporte@hiveplace.com</b>', 'bot');
+      });
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const message = userInput.value.trim();
+      if (!message) return;
+      enviarMensagem(message);
+      userInput.value = '';
+    });
+
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      chatBox.innerHTML = '';
+      appendMessage('🔄 <b>Sessão Corporativa Reiniciada</b><br><br>Todos os dados da conversa anterior foram apagados conforme nossa política de privacidade.<br><br>✅ Como posso auxiliá-lo com suas demandas empresariais agora?', 'bot');
+
+      fetch('https://n8n.yukz.com.br/webhook/text-hive-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reset: true })
+      })
+      .then(res => res.json())
+      .then(data => {
+        appendMessage(data.resposta || '✅ <b>Sessão Reiniciada com Sucesso</b><br><br>Seu ambiente de atendimento foi renovado conforme solicitado.<br><br>📊 Estou pronto para atender suas demandas corporativas.', 'bot');
+      })
+      .catch(err => console.error('Erro no reset:', err));
+    });
+
+    // Adicionar estilo para animação de rotação
+    const style = document.createElement('style');
+    style.textContent = `
+      .spin {
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .typing-indicator {
+        display: inline-block;
+      }
+      
+      .typing-indicator span {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: var(--hive-gold);
+        border-radius: 50%;
+        margin: 0 2px;
+        opacity: 0.6;
+        animation: typing 1.4s infinite both;
+      }
+      
+      .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      
+      .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      
+      @keyframes typing {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Mensagem de boas-vindas
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        appendMessage('👋 <b>Bem-vindo ao Atendimento Corporativo HIVEPlace</b><br><br>Sou seu assistente virtual especializado em soluções empresariais. Como posso auxiliá-lo hoje?<br><br>📊 <b>Relatórios e Analytics</b><br>📈 <b>Análises de Desempenho</b><br>🔧 <b>Suporte Técnico Avançado</b><br>📝 <b>Documentação Empresarial</b><br>💼 <b>Gestão de Projetos</b>', 'bot');
+      }, 500);
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <footer class="corporate-footer">
+    &copy; 2024 HIVEPlace Enterprise. Todos os direitos reservados.
+    <span class="d-none d-md-inline">| <a href="https://hiveplace.com" target="_blank">Site Institucional</a> | <a href="mailto:contato@hiveplace.com">Contato</a></span>
+  </footer>
+</body>
+</html>
