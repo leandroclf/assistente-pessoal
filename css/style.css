@@ -1,0 +1,139 @@
+/* Assistente Pessoal IA - Estilos Principais */
+
+/* Importação de arquivos base */
+@import url('./base/reset.css');
+@import url('./base/variables.css');
+@import url('./base/typography.css');
+
+/* Importação de layouts */
+@import url('./layout/main-layout.css');
+
+/* Importação de componentes */
+@import url('./components/orb.css');
+
+/* Utilitários e acessibilidade */
+.sr-announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Estilos adicionais para acessibilidade */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* Skip link para acessibilidade */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 8px;
+  background: var(--color-primary);
+  color: var(--color-background);
+  z-index: 100;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+.orb-container {
+  position: relative;
+}
+
+.orb {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle at 30% 30%, #00ffff, #004d4d);
+  border-radius: 50%;
+  box-shadow: 0 0 40px #00ffff88;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  border: none;
+  outline: none;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+.orb:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.ring {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  box-shadow: 0 0 30px #00ffff55;
+  animation: pulse 2s infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.orb.listening {
+  background: radial-gradient(circle at 30% 30%, #00ffcc, #005c5c);
+  box-shadow: 0 0 50px #00ffff;
+}
+
+.orb.playing {
+  background: radial-gradient(circle at 30% 30%, #ff00ff, #520052);
+  box-shadow: 0 0 50px #ff00ff99;
+}
+
+.ring.listening {
+  animation: vibrate 0.4s infinite;
+}
+
+.ring.playing {
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+@keyframes vibrate {
+  0% { transform: scale(1.05); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1.05); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 40px #ff00ff88; }
+  100% { box-shadow: 0 0 60px #ff00ffcc; }
+}
+
+.status-text {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #aaa;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

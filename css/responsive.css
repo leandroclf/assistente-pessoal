@@ -1,0 +1,39 @@
+/* Responsividade para tablets */
+@media (max-width: 1024px) {
+  .orb {
+    width: 150px;
+    height: 150px;
+  }
+  .ring {
+    width: 180px;
+    height: 180px;
+    top: -15px;
+    left: -15px;
+  }
+  .status-text {
+    font-size: 16px;
+  }
+}
+
+/* Responsividade para smartphones */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+    height: auto;
+    min-height: 100vh;
+  }
+  .orb {
+    width: 100px;
+    height: 100px;
+  }
+  .ring {
+    width: 120px;
+    height: 120px;
+    top: -10px;
+    left: -10px;
+  }
+  .status-text {
+    font-size: 14px;
+    margin-top: 12px;
+  }
+} 

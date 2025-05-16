@@ -1,0 +1,311 @@
+{
+  "name": "ALEXA NO N8N",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "jarvison",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        120,
+        -60
+      ],
+      "id": "ca375109-af90-444a-ab23-cf864f6ea5cc",
+      "name": "Webhook",
+      "webhookId": "71ac230d-5949-41ba-b05e-761cb5cb07f3"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Assistente Voz IA</title>\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <style>\n    body {\n      background-color: #000;\n      color: white;\n      font-family: 'Segoe UI', sans-serif;\n      display: flex;\n      flex-direction: column;\n      justify-content: center;\n      align-items: center;\n      height: 100vh;\n      margin: 0;\n      overflow: hidden;\n    }\n\n    .orb-container {\n      position: relative;\n    }\n\n    .orb {\n      width: 200px;\n      height: 200px;\n      background: radial-gradient(circle at 30% 30%, #00ffff, #004d4d);\n      border-radius: 50%;\n      box-shadow: 0 0 40px #00ffff88;\n      cursor: pointer;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      z-index: 2; /* Clique aqui */\n    }\n\n    .ring {\n      position: absolute;\n      top: -20px;\n      left: -20px;\n      width: 240px;\n      height: 240px;\n      border-radius: 50%;\n      box-shadow: 0 0 30px #00ffff55;\n      animation: pulse 2s infinite;\n      z-index: 1;\n      pointer-events: none; /* 🔥 ISSO FAZ A MAGIA DO CLIQUE FUNCIONAR */\n    }\n    \n    .orb.listening {\n      background: radial-gradient(circle at 30% 30%, #00ffcc, #005c5c);\n      box-shadow: 0 0 50px #00ffff;\n    }\n\n    .orb.playing {\n      background: radial-gradient(circle at 30% 30%, #ff00ff, #520052);\n      box-shadow: 0 0 50px #ff00ff99;\n    }\n\n    .ring.listening {\n      animation: vibrate 0.4s infinite;\n    }\n\n    .ring.playing {\n      animation: glow 1s ease-in-out infinite alternate;\n    }\n\n    @keyframes pulse {\n      0%, 100% { transform: scale(1); opacity: 0.6; }\n      50% { transform: scale(1.2); opacity: 1; }\n    }\n\n    @keyframes vibrate {\n      0% { transform: scale(1.05); }\n      50% { transform: scale(1.15); }\n      100% { transform: scale(1.05); }\n    }\n\n    @keyframes glow {\n      0% { box-shadow: 0 0 40px #ff00ff88; }\n      100% { box-shadow: 0 0 60px #ff00ffcc; }\n    }\n\n    .status-text {\n      margin-top: 20px;\n      font-size: 18px;\n      color: #aaa;\n      font-weight: 300;\n      font-style: italic;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"orb-container\">\n    <div id=\"ring\" class=\"ring\"></div>\n    <div id=\"orb\" class=\"orb\" title=\"Clique para falar com a IA\"></div>\n  </div>\n  <div id=\"status\" class=\"status-text\">Clique para falar</div>\n\n  <audio id=\"beep\" src=\"https://www.soundjay.com/button/sounds/button-3.mp3\" preload=\"auto\"></audio>\n\n  <script>\n    const orb = document.getElementById('orb');\n    const ring = document.getElementById('ring');\n    const statusText = document.getElementById('status');\n    const beep = document.getElementById('beep');\n\n    let recognition;\n    let lastTranscript = \"\";\n    let silenceTimeout;\n\n    function startRecognition() {\n      if (!('webkitSpeechRecognition' in window)) {\n        alert('Este navegador não suporta reconhecimento de voz.');\n        return;\n      }\n\n      beep.play();\n      recognition = new webkitSpeechRecognition();\n      recognition.lang = 'pt-BR';\n      recognition.interimResults = true;\n      recognition.continuous = true;\n      lastTranscript = \"\";\n\n      recognition.onstart = () => {\n        orb.classList.add('listening');\n        ring.classList.add('listening');\n        statusText.textContent = \"Ouvindo...\";\n      };\n\n      recognition.onresult = (event) => {\n        for (let i = event.resultIndex; i < event.results.length; ++i) {\n          if (event.results[i].isFinal) {\n            lastTranscript += event.results[i][0].transcript;\n          }\n        }\n\n        clearTimeout(silenceTimeout);\n        silenceTimeout = setTimeout(stopRecognition, 1000);\n      };\n\n      recognition.onerror = (event) => {\n        console.error('Erro:', event.error);\n        orb.classList.remove('listening');\n        ring.classList.remove('listening');\n        statusText.textContent = \"Erro: \" + event.error;\n      };\n\n      recognition.onend = () => {\n        orb.classList.remove('listening');\n        ring.classList.remove('listening');\n      };\n\n      recognition.start();\n    }\n\n    async function stopRecognition() {\n      if (recognition) {\n        recognition.stop();\n        orb.classList.remove('listening');\n        ring.classList.remove('listening');\n        statusText.textContent = \"Processando...\";\n\n        if (lastTranscript.trim() !== '') {\n          try {\n            const response = await fetch(\"COLOQUE AQUI SEU WEBHOOK\", {\n              method: \"POST\",\n              headers: { \"Content-Type\": \"application/json\" },\n              body: JSON.stringify({ pergunta: lastTranscript.trim() })\n            });\n\n            if (!response.ok) throw new Error(\"Erro na resposta do servidor\");\n\n            const blob = await response.blob();\n            const audioURL = URL.createObjectURL(blob);\n            const audio = new Audio(audioURL);\n\n            audio.onplay = () => {\n              orb.classList.add('playing');\n              ring.classList.add('playing');\n              statusText.textContent = \"Respondendo...\";\n            };\n\n            audio.onended = () => {\n              orb.classList.remove('playing');\n              ring.classList.remove('playing');\n              statusText.textContent = \"Clique para falar\";\n            };\n\n            audio.play();\n\n          } catch (err) {\n            console.error(\"Erro ao enviar ou processar resposta:\", err);\n            statusText.textContent = \"Erro ao falar com a IA\";\n          }\n        }\n      }\n    }\n\n    orb.addEventListener('click', () => {\n      if (recognition && recognition.running) {\n        stopRecognition();\n      } else {\n        startRecognition();\n      }\n    });\n  </script>\n</body>\n</html>\n"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        340,
+        -60
+      ],
+      "id": "5dcbc654-947b-4991-b7b7-0373a581ccf7",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        540,
+        -60
+      ],
+      "id": "738a5eed-cd2c-4139-ada2-3b57c8e15d0a",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "receber-audio",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        280
+      ],
+      "id": "8a23949c-a4dc-4091-9c82-5270bf02c73d",
+      "name": "Webhook1",
+      "webhookId": "287d40b1-4172-4ba0-9a1d-6d971dd9cf68"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.pergunta }}",
+        "options": {
+          "systemMessage": "Você é o assistente pessoal do Anderson Adelino."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        180,
+        280
+      ],
+      "id": "c65450a0-5859-4343-9c66-3dea100da862",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "memoriaTeste",
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        280,
+        480
+      ],
+      "id": "1ed487d4-58c2-4d50-a82d-ccd3398cd7f5",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        760,
+        280
+      ],
+      "id": "2d02ec69-aca1-4657-9e79-490d05bc0fd1",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.output }}",
+        "voice": "onyx",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        540,
+        280
+      ],
+      "id": "eac1506f-f65b-4728-98b2-724ddeb6cadc",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "UIdh5GYVgebaC1LF",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## BOLA FLUTUANTE FALANTE",
+        "height": 280,
+        "width": 760,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "5f68aed9-030b-4cb5-9d5c-55574d8d5335",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## PENSAMENTO POR TRÁS",
+        "height": 400,
+        "width": 1100,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -140,
+        200
+      ],
+      "typeVersion": 1,
+      "id": "541695e0-2818-4c15-9bef-38ce4b0ead70",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        140,
+        480
+      ],
+      "id": "460a6c31-26dd-4306-91d6-f38588b5ef7d",
+      "name": "4o-mini",
+      "credentials": {
+        "openAiApi": {
+          "id": "UIdh5GYVgebaC1LF",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Meu instagram: \n### https://www.instagram.com/oandersonadelino/\n\n## Operação StartIA:\n### https://andersonadelino.com.br/operacaostartia/",
+        "height": 220,
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        200,
+        -420
+      ],
+      "typeVersion": 1,
+      "id": "95f51256-c04a-4ce9-8aeb-aab3af08878c",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4o-mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d1ff998f-b1c9-4247-b145-692f6687e835",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6052a1b29f061469e8139dae44556603650099c3365d7598798f132ae827fa1c"
+  },
+  "id": "vBFjyLk26973yFOC",
+  "tags": [
+    {
+      "createdAt": "2025-03-23T20:58:00.431Z",
+      "updatedAt": "2025-03-23T20:58:00.431Z",
+      "id": "q9p789DuvvMN4ik7",
+      "name": "Youtube"
+    },
+    {
+      "createdAt": "2025-04-05T00:01:47.913Z",
+      "updatedAt": "2025-04-05T00:01:47.913Z",
+      "id": "14gXT8iNJWFJQigv",
+      "name": "Anderson Adelino"
+    }
+  ]
+}

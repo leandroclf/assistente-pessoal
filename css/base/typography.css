@@ -1,0 +1,58 @@
+/* Tipografia */
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: var(--spacing-md);
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: var(--font-size-xl);
+}
+
+h2 {
+  font-size: var(--font-size-lg);
+}
+
+p {
+  margin-bottom: var(--spacing-md);
+}
+
+.status-text {
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+  font-weight: 300;
+  font-style: italic;
+  margin-top: var(--spacing-lg);
+  text-align: center;
+}
+
+/* Estilos para links */
+a {
+  color: var(--color-primary);
+  transition: color var(--transition-speed);
+}
+
+a:hover, a:focus {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+/* Estilos para texto em diferentes estados */
+.listening-text {
+  color: var(--color-primary);
+}
+
+.playing-text {
+  color: var(--color-secondary);
+}
+
+.error-text {
+  color: #ff3333;
+}

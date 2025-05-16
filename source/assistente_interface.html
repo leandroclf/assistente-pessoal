@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Assistente de voz com inteligência artificial para responder suas perguntas">
+  <meta name="theme-color" content="#000000">
+  <title>Assistente Voz IA</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- Removido o link para responsive.css pois agora está integrado no sistema modular -->
+</head>
+<body>
+  <!-- Skip link para acessibilidade -->
+  <a href="#assistente" class="skip-link">Pular para o conteúdo principal</a>
+  
+  <header role="banner">
+    <h1 class="visually-hidden">Assistente de Voz com IA</h1>
+    <nav role="navigation" class="visually-hidden">
+      <ul>
+        <li><a href="#assistente">Assistente</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <main id="assistente" role="main">
+    <section aria-labelledby="assistente-titulo">
+      <h2 id="assistente-titulo" class="visually-hidden">Assistente de Voz</h2>
+      
+      <figure class="orb-container">
+        <button id="orb" class="orb" 
+                aria-label="Clique para falar com a IA" 
+                title="Clique para falar com a IA"></button>
+        <div id="ring" class="ring" aria-hidden="true"></div>
+      </figure>
+      
+      <output id="status" class="status-text" role="status" aria-live="polite">
+        Clique para falar
+      </output>
+      
+      <!-- Áudio otimizado com múltiplos formatos -->
+      <audio id="beep" preload="auto" aria-hidden="true">
+        <source src="../assets/audio/button-3.mp3" type="audio/mpeg">
+      </audio>
+    </section>
+  </main>
+  
+  <footer role="contentinfo">
+    <p class="visually-hidden">Desenvolvido para acessibilidade e responsividade.</p>
+  </footer>
+  
+  <!-- Anunciador para leitores de tela -->
+  <div aria-live="assertive" class="sr-announcer visually-hidden" id="screen-reader-announcer"></div>
+  
+  <script type="module" src="../js/main.js"></script>
+</body>
+</html>

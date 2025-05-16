@@ -1,0 +1,130 @@
+/* Componente Orb - elemento central da interface */
+.orb-container {
+  position: relative;
+  width: var(--orb-size-desktop);
+  height: var(--orb-size-desktop);
+  margin: var(--spacing-xl) 0;
+}
+
+.orb {
+  position: relative;
+  width: var(--orb-size-desktop);
+  height: var(--orb-size-desktop);
+  background: radial-gradient(circle at 30% 30%, var(--color-primary), var(--color-primary-dark));
+  border-radius: var(--border-radius-full);
+  box-shadow: var(--shadow-orb);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-index-orb);
+  border: none;
+  outline: none;
+  transition: box-shadow var(--transition-speed), background var(--transition-speed);
+}
+
+.orb:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.orb:hover {
+  box-shadow: var(--shadow-orb-active);
+}
+
+.ring {
+  position: absolute;
+  top: calc((var(--ring-size-desktop) - var(--orb-size-desktop)) / -2);
+  left: calc((var(--ring-size-desktop) - var(--orb-size-desktop)) / -2);
+  width: var(--ring-size-desktop);
+  height: var(--ring-size-desktop);
+  border-radius: var(--border-radius-full);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.33);
+  animation: pulse var(--animation-duration-long) infinite;
+  z-index: var(--z-index-ring);
+  pointer-events: none;
+}
+
+/* Estados do orb */
+.orb.listening {
+  background: radial-gradient(circle at 30% 30%, var(--color-primary), var(--color-primary-dark));
+  box-shadow: var(--shadow-orb-active);
+}
+
+.orb.playing {
+  background: radial-gradient(circle at 30% 30%, var(--color-secondary), var(--color-secondary-dark));
+  box-shadow: var(--shadow-orb-playing);
+}
+
+.orb.disabled {
+  background: radial-gradient(circle at 30% 30%, #555555, #333333);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Estados do ring */
+.ring.listening {
+  animation: vibrate var(--animation-duration-short) infinite;
+}
+
+.ring.playing {
+  animation: glow var(--animation-duration-medium) ease-in-out infinite alternate;
+}
+
+/* Animações */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+@keyframes vibrate {
+  0% { transform: scale(1.05); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1.05); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 40px rgba(255, 0, 255, 0.53); }
+  100% { box-shadow: 0 0 60px rgba(255, 0, 255, 0.8); }
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .orb-container {
+    width: var(--orb-size-tablet);
+    height: var(--orb-size-tablet);
+  }
+  
+  .orb {
+    width: var(--orb-size-tablet);
+    height: var(--orb-size-tablet);
+  }
+  
+  .ring {
+    width: var(--ring-size-tablet);
+    height: var(--ring-size-tablet);
+    top: calc((var(--ring-size-tablet) - var(--orb-size-tablet)) / -2);
+    left: calc((var(--ring-size-tablet) - var(--orb-size-tablet)) / -2);
+  }
+}
+
+@media (max-width: 600px) {
+  .orb-container {
+    width: var(--orb-size-mobile);
+    height: var(--orb-size-mobile);
+    margin: var(--spacing-lg) 0;
+  }
+  
+  .orb {
+    width: var(--orb-size-mobile);
+    height: var(--orb-size-mobile);
+  }
+  
+  .ring {
+    width: var(--ring-size-mobile);
+    height: var(--ring-size-mobile);
+    top: calc((var(--ring-size-mobile) - var(--orb-size-mobile)) / -2);
+    left: calc((var(--ring-size-mobile) - var(--orb-size-mobile)) / -2);
+  }
+}
